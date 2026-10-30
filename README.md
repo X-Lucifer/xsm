@@ -12,7 +12,11 @@ XSM 是基于 Rust 的 Windows 服务管理器，可将普通可执行程序托�
 
 ## 构建
 
-需要 Rust 1.99.1、Visual Studio C++ Build Tools 和 Windows SDK。项目已固定工具链与依赖版本。
+推送到仓库默认分支（当前为 `main`）后，GitHub Actions 会自动检查、构建 Windows x64 程序并创建 [Release](https://github.com/X-Lucifer/xsm/releases)，附带 `xsm.exe`、完整 ZIP 包和 SHA256 校验文件。本地无需构建或手动上传。发布标签采用 `v<version>-build.<run-id>`，每次推送独立发布，检查失败时不发布；其他分支和 PR 仅运行验证。
+
+发布步骤失败时，在 Actions 选择 **Re-run failed jobs** 可复用原构建产物继续发布，避免重新构建导致草稿中的文件与新产物不一致。
+
+本地构建需要 Rust 1.99.1、Visual Studio C++ Build Tools 和 Windows SDK。项目已固定工具链与依赖版本。
 
 ```powershell
 # 编译 Release

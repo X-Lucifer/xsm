@@ -1,8 +1,13 @@
 [CmdletBinding()]
-param()
+param(
+    [ValidateSet('', 'x86_64-pc-windows-msvc', 'i686-pc-windows-msvc', 'aarch64-pc-windows-msvc')]
+    [string]$Target = ''
+)
 $ErrorActionPreference = 'Stop'
 $project = Split-Path -Parent $PSScriptRoot
-$release = Join-Path $project 'target\release'
+$targetDirectory = Join-Path $project 'target'
+if ($Target) { $targetDirectory = Join-Path $targetDirectory $Target }
+$release = Join-Path $targetDirectory 'release'
 & (Join-Path $PSScriptRoot 'verify-resources.ps1') -Executable (Join-Path $release 'xsm.exe')
 $manifest = Get-Content -LiteralPath (Join-Path $project 'Cargo.toml') -Raw
 $version = [regex]::Match($manifest, '(?m)^version = "([0-9.]+)"').Groups[1].Value
