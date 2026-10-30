@@ -1,0 +1,41 @@
+#pragma code_page(65001)
+#include <windows.h>
+
+#ifndef XSM_ORIGINAL_FILENAME
+#define XSM_ORIGINAL_FILENAME "xsm.exe"
+#endif
+#ifndef XSM_FILE_DESCRIPTION
+#define XSM_FILE_DESCRIPTION "XSM Windows Service Manager"
+#endif
+
+101 ICON "xsm.ico"
+1 11 "event-message.bin"
+
+1 VERSIONINFO
+FILEVERSION XSM_VERSION_NUM
+PRODUCTVERSION XSM_VERSION_NUM
+FILEFLAGSMASK VS_FFI_FILEFLAGSMASK
+FILEFLAGS 0
+FILEOS VOS_NT_WINDOWS32
+FILETYPE VFT_APP
+FILESUBTYPE 0
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904B0"
+        BEGIN
+            VALUE "CompanyName", "Lucifer\0"
+            VALUE "FileDescription", XSM_FILE_DESCRIPTION "\0"
+            VALUE "FileVersion", XSM_VERSION_STR "\0"
+            VALUE "InternalName", "xsm\0"
+            VALUE "LegalCopyright", "Copyright © Lucifer. All rights reserved.\0"
+            VALUE "OriginalFilename", XSM_ORIGINAL_FILENAME "\0"
+            VALUE "ProductName", "XSM\0"
+            VALUE "ProductVersion", XSM_VERSION_STR "\0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x0409, 1200
+    END
+END

@@ -1,0 +1,24 @@
+name: Windows verification
+on: [push, pull_request]
+jobs:
+  verify:
+    runs-on: windows-2025
+    strategy:
+      matrix:
+        target: [x86_64-pc-windows-msvc, i686-pc-windows-msvc]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: 1.99.1
+          components: rustfmt, clippy
+          targets: ${{ matrix.target }}
+      - run: cargo fmt --all -- --check
+      - run: cargo clippy --locked --all-targets --target ${{ matrix.target }} -- -D warnings
+      - run: cargo test --locked --all-targets --target ${{ matrix.target }}
+      - run: cargo build --locked --release --bins --examples --target ${{ matrix.target }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: xsm-${{ matrix.target }}
+          path: |
+            target/${{ matrix.target }}/release/xsm.exe

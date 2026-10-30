@@ -1,0 +1,16 @@
+# Rust / Cargo
+# https://github.com/github/gitignore/blob/main/Rust.gitignore
+target/
+debug/
+**/*.rs.bk
+*.pdb
+**/mutants.out*/
+rustc-ice-*.txt
+
+# Local build, test and packaging output
+/test-results/
+/.tools/
+/dist/
+
+# Cargo.lock is intentionally tracked for reproducible application builds.
+

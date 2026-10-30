@@ -1,0 +1,50 @@
+[package]
+name = "xsm"
+version = "1.0.0"
+edition = "2024"
+rust-version = "1.99"
+description = "Native Windows service manager and process supervisor"
+
+[lib]
+name = "xsm"
+path = "src/lib.rs"
+
+[[bin]]
+name = "xsm"
+path = "src/main.rs"
+
+[dependencies]
+anyhow = "=1.0.104"
+
+[build-dependencies]
+embed-resource = "=3.0.11"
+
+[target.'cfg(windows)'.dependencies]
+eframe = { version = "=0.37.0", default-features = false, features = ["accesskit", "clipboard", "default_fonts", "links", "system_fonts", "wgpu_no_default_features"] }
+wgpu = { version = "=30.0.1", default-features = false, features = ["std", "parking_lot", "dx12", "wgsl"] }
+winreg = "=0.55.0"
+windows = { version = "=0.62.2", default-features = false, features = ["std", "Win32_Foundation", "Win32_System_Com", "Win32_UI_Shell"] }
+windows-sys = { version = "=0.61.2", features = [
+  "Win32_Foundation", "Win32_Security", "Win32_Security_Authentication_Identity",
+  "Win32_Security_Authorization", "Win32_Storage_FileSystem", "Win32_System_Console",
+  "Win32_System_Diagnostics_Debug", "Win32_System_Diagnostics_ToolHelp",
+  "Win32_System_Environment", "Win32_System_EventLog", "Win32_System_IO",
+  "Win32_System_JobObjects", "Win32_System_LibraryLoader", "Win32_System_Memory",
+  "Win32_System_Pipes", "Win32_System_Power", "Win32_System_ProcessStatus",
+  "Win32_System_Registry", "Win32_System_RemoteDesktop", "Win32_System_Services",
+  "Win32_System_SystemInformation", "Win32_System_Threading", "Win32_System_Time",
+  "Win32_UI_Controls", "Win32_UI_Controls_Dialogs", "Win32_UI_HiDpi", "Win32_UI_Input_KeyboardAndMouse",
+  "Win32_UI_Shell", "Win32_UI_WindowsAndMessaging", "Win32_Graphics_Gdi", "Win32_Graphics_Dwm", "Win32_Graphics_GdiPlus",
+  "Win32_System_Com", "Win32_System_SystemServices", "Win32_Globalization"
+] }
+
+[target.'cfg(windows)'.dev-dependencies]
+winit = { version = "=0.30.13", default-features = false }
+
+[profile.release]
+lto = "thin"
+codegen-units = 1
+strip = "debuginfo"
+
+[lints.rust]
+unsafe_op_in_unsafe_fn = "deny"
