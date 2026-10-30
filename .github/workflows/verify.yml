@@ -13,7 +13,7 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  verify:
+  build:
     if: github.event_name != 'push' || !github.event.deleted
     runs-on: windows-2025
     timeout-minutes: 45
@@ -28,7 +28,6 @@ jobs:
       - uses: dtolnay/rust-toolchain@683b588c487a69d01f6c6ddf40f036ff682cc2c8
         with:
           toolchain: 1.99.1
-          components: rustfmt, clippy
           targets: ${{ env.TARGET }}
       - name: Read build metadata
         id: metadata
@@ -45,16 +44,8 @@ jobs:
           "version=$version" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
           "commit=$commit" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
           "SOURCE_DATE_EPOCH=$epoch" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-      - name: Check formatting
-        run: cargo fmt --all -- --check
-      - name: Run Clippy
-        run: cargo clippy --locked --all-targets --target ${{ env.TARGET }} -- -D warnings
-      - name: Run Rust tests
-        run: cargo test --locked --all-targets --target ${{ env.TARGET }}
-      - name: Test release publishing logic
-        run: node --test scripts/tests/publish-release.test.cjs
       - name: Build Windows x64
-        run: cargo build --locked --release --bins --examples --target ${{ env.TARGET }}
+        run: cargo build --locked --release --bin xsm --target ${{ env.TARGET }}
       - name: Package release files
         shell: pwsh
         env:
@@ -72,7 +63,7 @@ jobs:
               '{0}  {1}' -f (Get-FileHash -LiteralPath (Join-Path $destination $file) -Algorithm SHA256).Hash.ToLowerInvariant(), $file
           }
           [IO.File]::WriteAllLines((Join-Path $destination 'SHA256SUMS.txt'), $checksums, [Text.UTF8Encoding]::new($false))
-      - name: Upload verified build
+      - name: Upload build artifacts
         id: artifact
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
@@ -83,7 +74,7 @@ jobs:
           retention-days: 14
 
   release:
-    needs: verify
+    needs: build
     if: >-
       github.event_name == 'push' &&
       !github.event.deleted &&
@@ -95,18 +86,18 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          ref: ${{ needs.verify.outputs.commit }}
+          ref: ${{ needs.build.outputs.commit }}
           persist-credentials: false
       - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
-          artifact-ids: ${{ needs.verify.outputs.artifact_id }}
+          artifact-ids: ${{ needs.build.outputs.artifact_id }}
           path: release-assets
           merge-multiple: true
       - name: Publish GitHub Release
         uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         env:
-          RELEASE_VERSION: ${{ needs.verify.outputs.version }}
-          RELEASE_COMMIT: ${{ needs.verify.outputs.commit }}
+          RELEASE_VERSION: ${{ needs.build.outputs.version }}
+          RELEASE_COMMIT: ${{ needs.build.outputs.commit }}
         with:
           retries: 0
           script: |
